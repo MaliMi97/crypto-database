@@ -7,6 +7,7 @@ DROP FUNCTION IF EXISTS tokens_with_specific_investor (VARCHAR(50));
 DROP FUNCTION IF EXISTS investors_of_specific_token (VARCHAR(10));
 DROP VIEW IF EXISTS token_investors;
 DROP PROCEDURE IF EXISTS insert_characteristic_by_description (VARCHAR(10), VARCHAR(200));
+DROP FUNCTION IF EXISTS token_characteristics_count ();
 DROP FUNCTION IF EXISTS tokens_with_specific_characteristic (VARCHAR(200));
 DROP FUNCTION IF EXISTS characteristics_of_specific_token (VARCHAR(10));
 DROP VIEW IF EXISTS token_characteristics;
@@ -22,8 +23,7 @@ DROP TABLE IF EXISTS crypto_token;
 CREATE TABLE crypto_token (
 	abbreviation VARCHAR(10) PRIMARY KEY,
 	token_name VARCHAR(50) UNIQUE NOT NULL,
-	website VARCHAR(200) UNIQUE,
-	sector VARCHAR(20),
+	website VARCHAR(200),
 	maximum_supply VARCHAR(25),
 	launch_date DATE
 );
@@ -96,6 +96,20 @@ BEGIN
 	SELECT token_characteristics.abbreviation, token_characteristics.token_name 
 	FROM token_characteristics 
 	WHERE description = _description;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION token_characteristics_count ()
+RETURNS TABLE(description VARCHAR(200), number_of_tokens BIGINT)
+AS $$
+BEGIN
+	RETURN QUERY
+	SELECT token_characteristics.description, COUNT(*) 
+	FROM token_characteristics 
+	GROUP BY token_characteristics.description 
+	HAVING COUNT(*) > 1 
+	ORDER BY COUNT(*) DESC;
 END
 $$
 LANGUAGE plpgsql;

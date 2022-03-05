@@ -47,7 +47,8 @@ class PostgreSQL():
             self.cur.execute(s)
             self.conn.commit()
         except Exception as e:
-            print(e)
+            if str(e)[:28] != "duplicate key value violates":
+                print(e)
             self.conn.rollback()
 
     def return_to_default(self):
@@ -63,8 +64,8 @@ class PostgreSQL():
         '''
         Fills the database with information about the token and connects the relations.
         '''
-        self.try_except(f'''INSERT INTO crypto_token (abbreviation, token_name, website, sector, maximum_supply, launch_date)
-VALUES ({self.return_string(d['crypto_token']['abbreviation'])}, {self.return_string(d['crypto_token']['token_name'])}, {self.return_string(d['crypto_token']['website'])}, {self.return_string(d['crypto_token']['sector'])}, {self.return_string(d['crypto_token']['maximum_supply'])}, {self.return_string(d['crypto_token']['launch_date'])})''')
+        self.try_except(f'''INSERT INTO crypto_token (abbreviation, token_name, website, maximum_supply, launch_date)
+VALUES ({self.return_string(d['crypto_token']['abbreviation'])}, {self.return_string(d['crypto_token']['token_name'])}, {self.return_string(d['crypto_token']['website'])}, {self.return_string(d['crypto_token']['maximum_supply'])}, {self.return_string(d['crypto_token']['launch_date'])})''')
         
         for i in d['social_media']:
             self.try_except(f'''INSERT INTO social_media (abbreviation, url)
